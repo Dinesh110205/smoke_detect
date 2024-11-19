@@ -84,14 +84,14 @@ jobs:
           # Connect to EC2 and perform deployment
           ssh -o StrictHostKeyChecking=no ubuntu@13.233.37.154 << EOF
             # Stop and remove any running container on port 8080
-            CONTAINER_ID=$(docker ps -q -f "ancestor=047719653539.dkr.ecr.ap-south-1.amazonaws.com/linux:latest")
+            CONTAINER_ID=$(docker ps -q -f "ancestor=047719653539.dkr.ecr.ap-south-1.amazonaws.com/fire_repo:latest")
             if [ ! -z "$CONTAINER_ID" ]; then
               docker stop $CONTAINER_ID
               docker rm $CONTAINER_ID
             fi
 
             # Optionally remove old images if needed
-            IMAGE_ID=$(docker images -q 047719653539.dkr.ecr.ap-south-1.amazonaws.com/linux:latest)
+            IMAGE_ID=$(docker images -q 047719653539.dkr.ecr.ap-south-1.amazonaws.com/fire_repo:latest)
             if [ ! -z "$IMAGE_ID" ]; then
               docker rmi $IMAGE_ID
             fi
@@ -100,10 +100,10 @@ jobs:
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 047719653539.dkr.ecr.ap-south-1.amazonaws.com
             
             # Pull the Docker image from ECR
-            docker pull 047719653539.dkr.ecr.ap-south-1.amazonaws.com/linux:latest
+            docker pull 047719653539.dkr.ecr.ap-south-1.amazonaws.com/fire_repo:latest
 
             # Run the Docker container on EC2
-            docker run -d -p 8080:8080 047719653539.dkr.ecr.ap-south-1.amazonaws.com/linux:latest
+            docker run -d -p 8080:8080 047719653539.dkr.ecr.ap-south-1.amazonaws.com/fire_repo:latest
           EOF
 
       # Optional: Check the running container logs (for debugging purposes)
