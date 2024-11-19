@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire and smoke Detection</title>
+    <style>
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(-45deg, #d3cce3, #e9e4f0, #c9d6ff, #e2e2e2);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 2.8em;
+            color: navy;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            width: 85%;
+            margin-top: 40px;
+            height: auto;
+            z-index: 10; /* Ensures it's above the background effects */
+        }
+
+        .column {
+            width: 48%;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .column:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .column button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffffff;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .column button:hover {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
+
+        .upload-preview, .predict-output {
+            width: 100%;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .upload-preview img, .upload-preview video, 
+        .predict-output img, .predict-output video {
+            max-width: 100%;
+            max-height: 300px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        video {
+            max-height: 300px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button#refresh {
+            margin-top: 30px;
+            width: auto;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            color: #fff;
+            background: #fd7e14;
+            border: none;
+            border-radius: 8px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button#refresh:hover {
+            background: #e65c00;
+        }
+
+        /* Floating Particle Background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particles span {
+            position: absolute;
+            display: block;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+            animation: particle 10s linear infinite;
+        }
+
+        @keyframes particle {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .particles span:nth-child(2n) {
+            animation-delay: 2s;
+        }
+        .particles span:nth-child(3n) {
+            animation-delay: 3s;
+            animation-duration: 8s;
+        }
+    </style>
+</head>
+<body>
+    <br> </br>
+    <h1>Fire and smoke Detection</h1>
+
+    <div class="particles">
+        <!-- Generate 50 floating particles -->
+        <script>
+            for (let i = 0; i < 50 ; i++) {
+                document.write('<span style="left:' + Math.random() * 100 + '%; top:' + Math.random() * 100 + 'vh; animation-duration:' + (5 + Math.random() * 5) + 's;"></span>');
+            }
+        </script>
+    </div>
+
+    <div class="container">
+        <!-- Left Column -->
+        <div class="column">
+            <form id="uploadForm" action="/detect" method="post" enctype="multipart/form-data">
+                <button type="button" onclick="document.getElementById('fileInput').click();">Upload</button>
+                <input id="fileInput" type="file" name="file" accept="image/,video/" style="display: none;" onchange="previewFile()">
+                <div class="upload-preview" id="uploadPreview">
+                    {% if uploaded_file %}
+                        {% if file_type == 'image' %}
+                            <img src="{{ uploaded_file }}" alt="Uploaded Image">
+                        {% elif file_type == 'video' %}
+                            <video controls>
+                                <source src="{{ uploaded_file }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Column -->
+        <div class="column">
+            <button type="submit" form="uploadForm">Predict</button>
+            <div class="predict-output" id="predictOutput">
+                {% if processed_file %}
+                    {% if file_type == 'image' %}
+                        <img src="{{ processed_file }}" alt="Processed Image">
+                    {% elif file_type == 'video' %}
+                        <video controls>
+                            <source src="{{ processed_file }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Refresh Button -->
+     <br> </br>
+    <button id="refresh" onclick="location.reload();">Refresh Page</button>
+    <br> </br>
+
+    <script>
+        function previewFile() {
+            const fileInput = document.getElementById('fileInput');
+            const preview = document.getElementById('uploadPreview');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+
+            reader.onloadend = function () {
+                if (file.type.startsWith('image/')) {
+                    preview.innerHTML = <img src="${reader.result}" alt="Uploaded Image">;
+                } else if (file.type.startsWith('video/')) {
+                    preview.innerHTML = <video controls><source src="${reader.result}" type="${file.type}">Your browser does not support the video tag.</video>;
+                }
+            };
+        }
+    </script>
+    <br> </br>
+    <br> </br>
+    
+    <h6>Fire and Smoke Detection  @copyrights of real paradox 2024</h6>
+</body>
+</html>
