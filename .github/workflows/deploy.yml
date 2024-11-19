@@ -100,7 +100,7 @@ jobs:
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 047719653539.dkr.ecr.ap-south-1.amazonaws.com
             
             # Pull the Docker image from ECR
-            docker pull 047719653539.dkr.ecr.ap-south-1.amazonaws.com/fire_repo:latest
+            docker pull 047719653539.dkr.ecr.ap-south-1.amazonaws.com/linux:latest
 
             # Run the Docker container on EC2
             docker run -d -p 8080:8080 047719653539.dkr.ecr.ap-south-1.amazonaws.com/linux:latest
