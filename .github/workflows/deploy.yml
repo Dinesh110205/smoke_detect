@@ -81,7 +81,7 @@ jobs:
       # Step 4: Deploy to EC2 instance
       - name: Deploy to EC2 instance
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@13.233.37.154 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@15.206.67.225 << 'EOF'
             # Install AWS CLI if missing
             if ! command -v aws &> /dev/null; then
               echo "Installing AWS CLI..."
@@ -113,7 +113,7 @@ jobs:
       # Optional: Check the running container logs (for debugging purposes)
       - name: Check Docker container logs
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@13.233.37.154 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@15.206.67.225 << 'EOF'
             echo "Listing running containers..."
             docker ps
           EOF
